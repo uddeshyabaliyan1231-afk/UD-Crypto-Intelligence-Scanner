@@ -13,33 +13,48 @@ app.use(express.static("public"));
 const API = "https://api.coindcx.com";
 const PUBLIC = "https://public.coindcx.com";
 
-const http = axios.create({ timeout: 15000 });
+const http = axios.create({ timeout: 20000 });
 
+// Normalize user input and CoinDCX instrument names
 function normalize(value) {
   return String(value || "")
+    .trim()
     .toUpperCase()
+    .replace(/^B-/, "")
     .replace(/[^A-Z0-9]/g, "");
 }
 
-// Find the exact active CoinDCX futures instrument
-async function findInstrument(input) {
-  const url =
-    API +
-    "/exchange/v1/derivatives/futures/data/active_instruments?margin_currency_short_name[]=USDT";
+// Fetch active USDT futures instruments
+async function getInstruments() {
+  const response = await http.get(
+    API + "/exchange/v1/derivatives/futures/data/active_instruments",
+    {
+      params: {
+        "margin_currency_short_name[]": "USDT"
+      }
+    }
+  );
 
-  const response = await http.get(url);
-  const instruments = response.data;
-
-  if (!Array.isArray(instruments)) {
-    throw new Error("Invalid CoinDCX instruments response");
+  if (!Array.isArray(response.data)) {
+    throw new Error("Invalid instruments response");
   }
 
+  return response.data;
+}
+
+// Find instrument with flexible symbol matching
+async function findInstrument(input) {
+  const instruments = await getInstruments();
+  const search = normalize(input);
+
   const match = instruments.find(
-    item => normalize(item) === normalize(input)
+    item => normalize(item) === search
   );
 
   if (!match) {
-    throw new Error("CoinDCX USDT futures pair not found or inactive");
+    throw new Error(
+      "Coin not found in active CoinDCX USDT futures list. Check the symbol."
+    );
   }
 
   return match;
@@ -51,11 +66,10 @@ async function getPrices(instrument) {
     PUBLIC + "/market_data/v3/current_prices/futures/rt"
   );
 
-  const prices = response.data.prices || {};
-  const item = prices[instrument];
+  const item = response.data?.prices?.[instrument];
 
   if (!item) {
-    throw new Error("Live futures price unavailable");
+    throw new Error("Live price unavailable");
   }
 
   return {
@@ -66,30 +80,29 @@ async function getPrices(instrument) {
     low_24h: item.l,
     volume_24h: item.v,
     change_percent: item.pc,
-    funding_rate: item.fr,
-    timestamp: response.data.ts
+    funding_rate: item.fr
   };
 }
 
-// Futures order book
+// Live futures order book
 async function getOrderBook(instrument) {
-  const url =
+  const response = await http.get(
     PUBLIC +
     "/market_data/v3/orderbook/" +
     encodeURIComponent(instrument) +
-    "-futures/50";
+    "-futures/50"
+  );
 
-  const response = await http.get(url);
   const data = response.data;
 
-  if (!data.bids || !data.asks) {
-    throw new Error("Invalid order book response");
+  if (!data?.bids || !data?.asks) {
+    throw new Error("Order book unavailable");
   }
 
   return data;
 }
 
-// Futures 5-minute candles
+// 5-minute futures candles
 async function getCandles(instrument) {
   const now = Math.floor(Date.now() / 1000);
   const from = now - (200 * 5 * 60);
@@ -107,13 +120,14 @@ async function getCandles(instrument) {
     }
   );
 
-  const data = response.data;
-
-  if (data.s !== "ok" || !Array.isArray(data.data)) {
-    throw new Error("Invalid futures candle response");
+  if (
+    response.data?.s !== "ok" ||
+    !Array.isArray(response.data.data)
+  ) {
+    throw new Error("5-minute candles unavailable");
   }
 
-  return data.data;
+  return response.data.data;
 }
 
 app.get("/api/health", (req, res) => {
@@ -121,21 +135,35 @@ app.get("/api/health", (req, res) => {
     status: "online",
     scanner: "UD Crypto Intelligence",
     exchange: "CoinDCX Futures",
-    timeframe: "5 minutes",
-    timestamp: new Date().toISOString()
+    timeframe: "5m"
   });
 });
 
-// Search and scan one CoinDCX futures coin
+// Active coin list
+app.get("/api/pairs", async (req, res) => {
+  try {
+    const instruments = await getInstruments();
+
+    res.json({
+      success: true,
+      count: instruments.length,
+      pairs: instruments
+    });
+  } catch (error) {
+    res.status(502).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Scan coin
 app.get("/api/scan/:pair", async (req, res) => {
   try {
     const input = req.params.pair;
 
     if (!input || input.length > 40) {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid coin name"
-      });
+      throw new Error("Invalid coin name");
     }
 
     const instrument = await findInstrument(input);
@@ -149,7 +177,7 @@ app.get("/api/scan/:pair", async (req, res) => {
     const [ticker, orderbook, candles] = results;
 
     const data = {
-      requested_coin: input,
+      coin: input,
       instrument,
       exchange: "CoinDCX Futures",
       timeframe: "5m",
@@ -174,31 +202,49 @@ app.get("/api/scan/:pair", async (req, res) => {
         ticker: ticker.status,
         orderbook: orderbook.status,
         candles: candles.status
+      },
+
+      errors: {
+        ticker:
+          ticker.status === "rejected"
+            ? ticker.reason.message
+            : null,
+
+        orderbook:
+          orderbook.status === "rejected"
+            ? orderbook.reason.message
+            : null,
+
+        candles:
+          candles.status === "rejected"
+            ? candles.reason.message
+            : null
       }
     };
 
-    const allAvailable = results.every(
+    const complete = results.every(
       result => result.status === "fulfilled"
     );
 
     res.json({
       success: true,
-      complete: allAvailable,
+      complete,
       data,
-      message: allAvailable
-        ? "All three CoinDCX futures data sources received"
-        : "Some data sources unavailable. Trade analysis not permitted."
+      message: complete
+        ? "All market data received"
+        : "Incomplete data. No trade signal permitted."
     });
 
   } catch (error) {
     res.status(502).json({
       success: false,
-      error: error.message,
-      timestamp: new Date().toISOString()
+      error: error.message
     });
   }
 });
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log("UD Crypto Intelligence running on " + PORT);
+  console.log(
+    "UD Crypto Intelligence running on port " + PORT
+  );
 });
