@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UD Crypto Intelligence Scanner</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#080d18;color:#e8edf7;font-family:Arial,sans-serif}
+header{padding:22px;background:#101a2d;border-bottom:1px solid #26344d}
+h1{margin:0;font-size:22px;color:#55b8ff}
+header p{color:#9baac0;font-size:12px}
+main{max-width:1100px;margin:auto;padding:18px}
+.panel{background:#111c30;border:1px solid #263750;border-radius:12px;padding:17px;margin-bottom:16px}
+label{display:block;color:#9baac0;font-size:12px;margin-bottom:8px}
+input{width:100%;padding:14px;border-radius:8px;border:1px solid #354965;background:#091322;color:white;font-size:16px}
+button{width:100%;padding:14px;margin-top:12px;background:#1688e8;color:white;border:0;border-radius:8px;font-size:16px;font-weight:bold}
+button:disabled{opacity:.5}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.data{background:#0a1425;border-radius:9px;padding:15px;min-height:85px}
+.data small{display:block;color:#93a5bd;margin-bottom:10px}
+.value{font-size:15px;font-weight:bold;overflow-wrap:anywhere}
+.status{color:#55b8ff}
+.result{text-align:center;padding:22px}
+.signal{font-size:32px;font-weight:bold}
+.buy{color:#20d889}
+.sell{color:#ff5b68}
+.pending{color:#ffc65a}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px;color:#a9bdd8}
+@media(max-width:500px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+<h1>UD CRYPTO INTELLIGENCE</h1>
+<p>COINDCX LIVE MARKET ANALYSIS</p>
+</header>
+
+<main>
+<div class="panel">
+<label>ENTER COINDCX FUTURES COIN / PAIR</label>
+<input id="coin" placeholder="Example: KERNELUSDT" value="KERNELUSDT">
+<button id="scan" onclick="scanCoin()">SEARCH / SCAN COIN</button>
+<p id="status" class="status">Scanner ready</p>
+</div>
+
+<div class="panel">
+<h3>LIVE MARKET DATA</h3>
+<div class="grid">
+<div class="data"><small>Live Price</small><div id="price" class="value">--</div></div>
+<div class="data"><small>24H Volume</small><div id="volume" class="value">--</div></div>
+<div class="data"><small>Order Book</small><div id="book" class="value">Waiting</div></div>
+<div class="data"><small>Technical Candles</small><div id="candles" class="value">Waiting</div></div>
+</div>
+</div>
+
+<div class="panel result">
+<h3>FINAL TRADE SIGNAL</h3>
+<div id="signal" class="signal pending">SCANNING REQUIRED</div>
+<p id="reason">Awaiting complete market analysis</p>
+</div>
+
+<div class="panel">
+<h3>DATA SOURCE STATUS</h3>
+<pre id="details">No scan performed yet.</pre>
+</div>
+</main>
+
+<script>
+async function scanCoin(){
+ const pair=document.getElementById("coin").value.trim().toUpperCase();
+ if(!pair){alert("Enter a coin name");return}
+
+ const button=document.getElementById("scan");
+ button.disabled=true;
+ document.getElementById("status").textContent="Fetching CoinDCX data...";
+ document.getElementById("signal").textContent="ANALYZING";
+ document.getElementById("signal").className="signal pending";
+
+ try{
+  const response=await fetch("/api/scan/"+encodeURIComponent(pair));
+  const result=await response.json();
+
+  if(!result.success)throw new Error(result.error||"Scan failed");
+
+  const d=result.data;
+  const t=d.ticker;
+  document.getElementById("price").textContent=t?.last_price??"--";
+  document.getElementById("volume").textContent=t?.volume??"--";
+  document.getElementById("book").textContent=d.orderbook?"Received":"Unavailable";
+  document.getElementById("candles").textContent=Array.isArray(d.candles)?d.candles.length+" candles":"Received / unavailable";
+  document.getElementById("status").textContent="Data received for "+pair;
+  document.getElementById("signal").textContent="ANALYSIS PENDING";
+  document.getElementById("reason").textContent="Live data collected. Trade signal engine will be activated after data validation.";
+  document.getElementById("details").textContent=JSON.stringify(d.dataStatus,null,2);
+
+ }catch(e){
+  document.getElementById("status").textContent="Error: "+e.message;
+  document.getElementById("signal").textContent="DATA ERROR";
+  document.getElementById("reason").textContent="Reliable data unavailable. No trade signal.";
+ }finally{
+  button.disabled=false;
+ }
+}
+</script>
+</body>
+</html>
