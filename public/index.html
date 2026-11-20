@@ -3,102 +3,286 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UD Crypto Intelligence Scanner</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UD Crypto Intelligence Pro</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#080d18;color:#e8edf7;font-family:Arial,sans-serif}
-header{padding:22px;background:#101a2d;border-bottom:1px solid #26344d}
-h1{margin:0;font-size:22px;color:#55b8ff}
-header p{color:#9baac0;font-size:12px}
+header{padding:24px 18px;background:#101d32;border-bottom:1px solid #263750}
+h1{margin:0;color:#55b5ff;font-size:25px}
+header p{color:#9baec9}
 main{max-width:1100px;margin:auto;padding:18px}
-.panel{background:#111c30;border:1px solid #263750;border-radius:12px;padding:17px;margin-bottom:16px}
-label{display:block;color:#9baac0;font-size:12px;margin-bottom:8px}
-input{width:100%;padding:14px;border-radius:8px;border:1px solid #354965;background:#091322;color:white;font-size:16px}
-button{width:100%;padding:14px;margin-top:12px;background:#1688e8;color:white;border:0;border-radius:8px;font-size:16px;font-weight:bold}
+.panel{background:#111f35;border:1px solid #293b56;border-radius:16px;padding:18px;margin-bottom:18px}
+label{display:block;color:#a9bad1;margin-bottom:12px}
+input{width:100%;padding:17px;background:#081322;border:1px solid #405775;border-radius:12px;color:white;font-size:19px;margin-bottom:12px}
+button{width:100%;padding:16px;background:#1689e8;color:white;border:0;border-radius:10px;font-size:18px;font-weight:bold}
 button:disabled{opacity:.5}
+h2{font-size:21px}
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.data{background:#0a1425;border-radius:9px;padding:15px;min-height:85px}
-.data small{display:block;color:#93a5bd;margin-bottom:10px}
-.value{font-size:15px;font-weight:bold;overflow-wrap:anywhere}
-.status{color:#55b8ff}
-.result{text-align:center;padding:22px}
-.signal{font-size:32px;font-weight:bold}
+.data{background:#091426;border-radius:12px;padding:17px;min-width:0}
+small{display:block;color:#9baec9;margin-bottom:12px}
+.value{font-size:18px;font-weight:bold;overflow-wrap:anywhere}
+.status{color:#55b5ff;margin-top:15px}
+.result{text-align:center;padding:25px}
+.signal{font-size:34px;font-weight:bold;margin:20px 0}
 .buy{color:#20d889}
-.sell{color:#ff5b68}
+.sell{color:#ff626f}
 .pending{color:#ffc65a}
-pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px;color:#a9bdd8}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;color:#a9bdd8;font-size:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{padding:9px;border-bottom:1px solid #293b56;text-align:right}
+td:first-child,th:first-child{text-align:left}
 @media(max-width:500px){.grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <header>
-<h1>UD CRYPTO INTELLIGENCE</h1>
-<p>COINDCX LIVE MARKET ANALYSIS</p>
+<h1>UD CRYPTO INTELLIGENCE PRO</h1>
+<p>COINDCX LIVE MARKET INTELLIGENCE</p>
 </header>
 
 <main>
 <div class="panel">
 <label>ENTER COINDCX FUTURES COIN / PAIR</label>
-<input id="coin" placeholder="Example: KERNELUSDT" value="KERNELUSDT">
+<input id="coin" value="KERNELUSDT" placeholder="Example: BTCUSDT">
 <button id="scan" onclick="scanCoin()">SEARCH / SCAN COIN</button>
 <p id="status" class="status">Scanner ready</p>
 </div>
 
 <div class="panel">
-<h3>LIVE MARKET DATA</h3>
+<h2>LIVE MARKET DATA</h2>
 <div class="grid">
 <div class="data"><small>Live Price</small><div id="price" class="value">--</div></div>
 <div class="data"><small>24H Volume</small><div id="volume" class="value">--</div></div>
+<div class="data"><small>24H Change</small><div id="change" class="value">--</div></div>
+<div class="data"><small>Funding Rate</small><div id="funding" class="value">--</div></div>
 <div class="data"><small>Order Book</small><div id="book" class="value">Waiting</div></div>
 <div class="data"><small>Technical Candles</small><div id="candles" class="value">Waiting</div></div>
 </div>
 </div>
 
-<div class="panel result">
-<h3>FINAL TRADE SIGNAL</h3>
-<div id="signal" class="signal pending">SCANNING REQUIRED</div>
-<p id="reason">Awaiting complete market analysis</p>
+<div class="panel">
+<h2>TECHNICAL ANALYSIS</h2>
+<div class="grid">
+<div class="data"><small>EMA 9</small><div id="ema9" class="value">--</div></div>
+<div class="data"><small>EMA 20</small><div id="ema20" class="value">--</div></div>
+<div class="data"><small>RSI 14</small><div id="rsi" class="value">--</div></div>
+<div class="data"><small>Volume Confirmation</small><div id="volcheck" class="value">--</div></div>
+<div class="data"><small>Trend Direction</small><div id="trend" class="value">--</div></div>
+<div class="data"><small>Last Candle</small><div id="lastcandle" class="value">--</div></div>
+</div>
 </div>
 
 <div class="panel">
-<h3>DATA SOURCE STATUS</h3>
+<h2>LIVE ORDER BOOK ANALYSIS</h2>
+<div class="grid">
+<div class="data"><small>Best Bid</small><div id="bid" class="value">--</div></div>
+<div class="data"><small>Best Ask</small><div id="ask" class="value">--</div></div>
+<div class="data"><small>Spread %</small><div id="spread" class="value">--</div></div>
+<div class="data"><small>Buy / Sell Depth Ratio</small><div id="imbalance" class="value">--</div></div>
+</div>
+</div>
+
+<div class="panel">
+<h2>LIQUIDITY TRAP PROTECTION</h2>
+<div class="grid">
+<div class="data"><small>Spread Filter</small><div id="spreadcheck" class="value">--</div></div>
+<div class="data"><small>Market Depth</small><div id="depthcheck" class="value">--</div></div>
+<div class="data"><small>Volume Filter</small><div id="liquiditycheck" class="value">--</div></div>
+<div class="data"><small>Overall Protection</small><div id="trapcheck" class="value">--</div></div>
+</div>
+</div>
+
+<div class="panel result">
+<h2>FINAL TRADE SIGNAL</h2>
+<div id="signal" class="signal pending">ANALYSIS PENDING</div>
+<p id="reason">Waiting for complete live data validation.</p>
+</div>
+
+<div class="panel">
+<h2>DATA SOURCE STATUS</h2>
 <pre id="details">No scan performed yet.</pre>
 </div>
+
 </main>
 
 <script>
-async function scanCoin(){
- const pair=document.getElementById("coin").value.trim().toUpperCase();
- if(!pair){alert("Enter a coin name");return}
+const $ = id => document.getElementById(id);
 
- const button=document.getElementById("scan");
+function fmt(x){
+ if(x===null||x===undefined||!Number.isFinite(Number(x)))return "--";
+ return Number(x).toLocaleString("en-IN",{maximumFractionDigits:8});
+}
+
+function ema(values,period){
+ if(values.length<period)return null;
+ let k=2/(period+1);
+ let v=values.slice(0,period).reduce((a,b)=>a+b,0)/period;
+ for(let i=period;i<values.length;i++)v=values[i]*k+v*(1-k);
+ return v;
+}
+
+function rsi(values,period=14){
+ if(values.length<=period)return null;
+ let gains=0,losses=0;
+ for(let i=values.length-period;i<values.length;i++){
+  let d=values[i]-values[i-1];
+  if(d>0)gains+=d;
+  else losses-=d;
+ }
+ if(losses===0)return 100;
+ return 100-(100/(1+gains/losses));
+}
+
+function level(x){
+ if(Array.isArray(x))return {price:Number(x[0]),qty:Number(x[1])};
+ if(typeof x==="object"&&x!==null){
+  return {
+   price:Number(x.price??x.p),
+   qty:Number(x.quantity??x.qty??x.amount??x.q)
+  };
+ }
+ return null;
+}
+
+function set(id,value){
+ $(id).textContent=value;
+}
+
+async function scanCoin(){
+ const pair=$("coin").value.trim().toUpperCase();
+ if(!pair){alert("Enter coin name");return;}
+
+ const button=$("scan");
  button.disabled=true;
- document.getElementById("status").textContent="Fetching CoinDCX data...";
- document.getElementById("signal").textContent="ANALYZING";
- document.getElementById("signal").className="signal pending";
+ set("status","Fetching CoinDCX live data...");
+ set("signal","ANALYSIS PENDING");
+ $("signal").className="signal pending";
+ set("reason","Validating market data and liquidity...");
 
  try{
   const response=await fetch("/api/scan/"+encodeURIComponent(pair));
   const result=await response.json();
 
-  if(!result.success)throw new Error(result.error||"Scan failed");
+  if(!response.ok||!result.success)
+   throw new Error(result.error||"Scan failed");
 
   const d=result.data;
   const t=d.ticker;
-  document.getElementById("price").textContent=t?.last_price??"--";
-  document.getElementById("volume").textContent=t?.volume??"--";
-  document.getElementById("book").textContent=d.orderbook?"Received":"Unavailable";
-  document.getElementById("candles").textContent=Array.isArray(d.candles)?d.candles.length+" candles":"Received / unavailable";
-  document.getElementById("status").textContent="Data received for "+pair;
-  document.getElementById("signal").textContent="ANALYSIS PENDING";
-  document.getElementById("reason").textContent="Live data collected. Trade signal engine will be activated after data validation.";
-  document.getElementById("details").textContent=JSON.stringify(d.dataStatus,null,2);
+  const ob=d.orderbook;
+  const candles=d.candles;
 
- }catch(e){
-  document.getElementById("status").textContent="Error: "+e.message;
-  document.getElementById("signal").textContent="DATA ERROR";
-  document.getElementById("reason").textContent="Reliable data unavailable. No trade signal.";
+  const statuses=d.dataStatus||{};
+  set("details",JSON.stringify(statuses,null,2));
+
+  if(!t||!ob||!candles||!Array.isArray(candles)||candles.length<30){
+   throw new Error("Required live data incomplete");
+  }
+
+  const price=Number(t.last_price);
+  const volume=Number(t.volume_24h);
+  const change=Number(t.change_percent);
+  const funding=Number(t.funding_rate);
+
+  if(!(price>0)||!(volume>0))
+   throw new Error("Invalid ticker price or volume");
+
+  set("price",fmt(price));
+  set("volume",fmt(volume));
+  set("change",fmt(change)+"%");
+  set("funding",fmt(funding));
+  set("book","Received");
+  set("candles",candles.length+" candles");
+
+  // Technical calculations
+  const closes=candles.map(c=>Number(c.close)).filter(Number.isFinite);
+  const volumes=candles.map(c=>Number(c.volume)||0);
+
+  if(closes.length<30)throw new Error("Insufficient candle history");
+
+  const e9=ema(closes,9);
+  const e20=ema(closes,20);
+  const r=rsi(closes);
+  const last=closes[closes.length-1];
+  const previous=closes[closes.length-2];
+
+  const recentVol=volumes.slice(-5);
+  const oldVol=volumes.slice(-25,-5);
+  const avgRecent=recentVol.reduce((a,b)=>a+b,0)/recentVol.length;
+  const avgOld=oldVol.reduce((a,b)=>a+b,0)/oldVol.length;
+  const risingVolume=avgRecent>avgOld;
+
+  set("ema9",fmt(e9));
+  set("ema20",fmt(e20));
+  set("rsi",fmt(r));
+  set("volcheck",risingVolume?"RISING":"NOT RISING");
+  set("trend",e9>e20&&last>e20?"BULLISH":e9<e20&&last<e20?"BEARISH":"MIXED");
+  set("lastcandle",last>previous?"GREEN":last<previous?"RED":"NEUTRAL");
+
+  // Order book
+  const bids=(ob.bids||[]).map(level).filter(x=>x&&x.price>0&&x.qty>0);
+  const asks=(ob.asks||[]).map(level).filter(x=>x&&x.price>0&&x.qty>0);
+
+  if(!bids.length||!asks.length)throw new Error("Invalid order book levels");
+
+  const bestBid=Math.max(...bids.map(x=>x.price));
+  const bestAsk=Math.min(...asks.map(x=>x.price));
+
+  const bidDepth=bids.reduce((s,x)=>s+x.price*x.qty,0);
+  const askDepth=asks.reduce((s,x)=>s+x.price*x.qty,0);
+
+  const ratio=askDepth>0?bidDepth/askDepth:0;
+  const spread=(bestAsk-bestBid)/((bestAsk+bestBid)/2)*100;
+
+  set("bid",fmt(bestBid));
+  set("ask",fmt(bestAsk));
+  set("spread",fmt(spread)+"%");
+  set("imbalance",fmt(ratio));
+
+  // Conservative liquidity checks
+  const spreadOK=spread>0&&spread<=0.15;
+  const depthOK=bidDepth>0&&askDepth>0&&Math.min(bidDepth,askDepth)>100;
+  const volumeOK=volume>0;
+
+  set("spreadcheck",spreadOK?"PASS":"FAIL");
+  set("depthcheck",depthOK?"PASS":"FAIL");
+  set("liquiditycheck",volumeOK?"PASS":"FAIL");
+
+  const trapOK=spreadOK&&depthOK&&volumeOK;
+  set("trapcheck",trapOK?"PASS":"BLOCKED");
+
+  // Trade confirmation
+  const bullish=e9>e20&&last>e20&&r>=50&&r<=70&&
+                risingVolume&&ratio>=1.15;
+  const bearish=e9<e20&&last<e20&&r<=50&&r>=30&&
+                risingVolume&&ratio<=0.87;
+
+  let finalSignal="NO TRADE";
+  let explanation="Mandatory confirmations not satisfied.";
+
+  if(trapOK&&bullish){
+   finalSignal="BUY";
+   explanation="Bullish trend, momentum, volume and order book confirmations passed.";
+  }else if(trapOK&&bearish){
+   finalSignal="SELL";
+   explanation="Bearish trend, momentum, volume and order book confirmations passed.";
+  }else if(!trapOK){
+   explanation="Liquidity protection blocked this setup. Do not enter.";
+  }
+
+  set("signal",finalSignal);
+  $("signal").className="signal "+
+   (finalSignal==="BUY"?"buy":finalSignal==="SELL"?"sell":"pending");
+
+  set("reason",explanation);
+  set("status","Live scan completed for "+pair);
+
+ }catch(error){
+  set("status","ERROR: "+error.message);
+  set("signal","DATA ERROR");
+  $("signal").className="signal pending";
+  set("reason","Reliable data unavailable. No trade signal.");
+  set("details",error.message);
  }finally{
   button.disabled=false;
  }
