@@ -13,50 +13,96 @@ body{
  font-family:Arial,sans-serif;
 }
 header{
- padding:30px 20px;background:#112039;
+ padding:28px 20px;background:#112039;
  border-bottom:1px solid #293b58;
 }
 h1{color:#55b5ff;margin:0;font-size:27px}
-header p{color:#9eafc8;margin-top:20px}
-main{max-width:850px;margin:auto;padding:20px}
+header p{color:#9eafc8;margin-top:15px}
+main{max-width:950px;margin:auto;padding:18px}
 .panel{
  background:#112039;border:1px solid #293b58;
- border-radius:24px;padding:25px;margin-bottom:24px;
+ border-radius:22px;padding:22px;margin-bottom:20px;
 }
-h2{font-size:23px;margin:5px 0 25px}
+h2{font-size:21px;margin:5px 0 20px}
 input{
- width:100%;padding:20px;border-radius:16px;
+ width:100%;padding:18px;border-radius:14px;
  background:#071426;border:1px solid #49617f;
- color:white;font-size:20px;margin:15px 0;
+ color:white;font-size:19px;margin:14px 0;
 }
 button{
- width:100%;padding:20px;border:0;border-radius:15px;
+ width:100%;padding:19px;border:0;border-radius:14px;
  background:#168bea;color:white;font-size:18px;
  font-weight:bold;cursor:pointer;
 }
 button:disabled{opacity:.5}
-.status{color:#61b7ff;margin-top:15px;overflow-wrap:anywhere}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.data{
- background:#081529;border-radius:17px;padding:20px;
- min-width:0;overflow-wrap:anywhere;
+.status{color:#61b7ff;overflow-wrap:anywhere}
+.grid{
+ display:grid;grid-template-columns:1fr 1fr;gap:12px;
 }
-.data small{display:block;color:#9eafc8;margin-bottom:15px;font-size:15px}
-.value{font-size:20px;font-weight:bold;overflow-wrap:anywhere}
-.result{text-align:center;padding:35px 15px}
-.signal{font-size:37px;font-weight:bold;margin:20px 0}
+.data{
+ background:#081529;border-radius:15px;
+ padding:16px;min-width:0;overflow-wrap:anywhere;
+}
+.data small{
+ display:block;color:#9eafc8;margin-bottom:10px;
+ font-size:13px;
+}
+.value{font-size:18px;font-weight:bold}
+.good{color:#35dc9b}
+.bad{color:#ff657c}
+.warn{color:#ffc75d}
+.neutral{color:#a9bad2}
+.signal{text-align:center;padding:28px 12px}
+.signal strong{
+ display:block;font-size:42px;margin:15px 0;
+}
 .buy{color:#35dc9b}
 .sell{color:#ff657c}
 .pending{color:#ffc75d}
-.good{color:#35dc9b}
-.bad{color:#ff657c}
+.tf{
+ border:1px solid #314765;
+ background:#09172b;
+ border-radius:16px;
+ padding:16px;margin-bottom:12px;
+}
+.tfhead{
+ display:flex;justify-content:space-between;
+ align-items:center;gap:10px;margin-bottom:14px;
+}
+.tfhead strong{font-size:20px;color:#65baff}
+.pill{
+ padding:7px 12px;border-radius:20px;
+ background:#172943;font-weight:bold;font-size:12px;
+}
+.metrics{
+ display:grid;grid-template-columns:1fr 1fr;
+ gap:10px;
+}
+.metric{
+ background:#102039;border-radius:10px;
+ padding:11px;font-size:13px;
+}
+.metric span{display:block;color:#9eafc8;margin-bottom:7px}
+.metric b{overflow-wrap:anywhere}
+.pricebox{
+ display:grid;grid-template-columns:1fr 1fr;
+ gap:12px;
+}
+.priceitem{
+ background:#081529;padding:16px;
+ border-radius:13px;
+}
+.priceitem small{display:block;color:#9eafc8;margin-bottom:8px}
+.priceitem b{font-size:19px;overflow-wrap:anywhere}
 pre{
  white-space:pre-wrap;overflow-wrap:anywhere;
- color:#a9bad2;font-size:13px;
+ color:#a9bad2;font-size:12px;
 }
 @media(max-width:520px){
+ main{padding:12px}
+ .panel{padding:16px}
  .grid{grid-template-columns:1fr}
- .panel{padding:20px}
+ .signal strong{font-size:35px}
 }
 </style>
 </head>
@@ -64,166 +110,163 @@ pre{
 <body>
 <header>
 <h1>UD CRYPTO INTELLIGENCE PRO</h1>
-<p>COINDCX LIVE MARKET INTELLIGENCE</p>
+<p>COINDCX MULTI-TIMEFRAME FUTURES INTELLIGENCE</p>
 </header>
 
 <main>
 
-<div class="panel">
+<section class="panel">
 <h2>COINDCX FUTURES SCANNER</h2>
 <label>ENTER COINDCX FUTURES COIN / PAIR</label>
-<input id="coin" value="KERNELUSDT" placeholder="Example: KERNELUSDT">
-<button id="scan" onclick="scanCoin()">SEARCH / SCAN COIN</button>
+<input id="coin" value="EVAAUSDT"
+ placeholder="Example: EVAAUSDT">
+<button id="scan" onclick="scanCoin()">SCAN COIN</button>
 <p id="status" class="status">Scanner ready</p>
-</div>
+</section>
 
-<div class="panel">
+<section class="panel">
 <h2>LIVE MARKET DATA</h2>
 <div class="grid">
-<div class="data"><small>Live Price</small><div id="price" class="value">--</div></div>
-<div class="data"><small>24H Volume</small><div id="volume" class="value">--</div></div>
-<div class="data"><small>24H Change</small><div id="change" class="value">--</div></div>
-<div class="data"><small>Funding Rate</small><div id="funding" class="value">--</div></div>
-<div class="data"><small>Order Book</small><div id="book" class="value">Waiting</div></div>
-<div class="data"><small>Technical Candles</small><div id="candles" class="value">Waiting</div></div>
+ <div class="data"><small>Live Price</small><div id="price" class="value">--</div></div>
+ <div class="data"><small>24H Volume</small><div id="volume" class="value">--</div></div>
+ <div class="data"><small>24H Change</small><div id="change" class="value">--</div></div>
+ <div class="data"><small>Funding Rate</small><div id="funding" class="value">--</div></div>
 </div>
-</div>
+</section>
 
-<div class="panel">
-<h2>TECHNICAL ANALYSIS</h2>
-<div class="grid">
-<div class="data"><small>EMA 9</small><div id="ema9" class="value">--</div></div>
-<div class="data"><small>EMA 20</small><div id="ema20" class="value">--</div></div>
-<div class="data"><small>RSI 14</small><div id="rsi" class="value">--</div></div>
-<div class="data"><small>Volume Confirmation</small><div id="volcheck" class="value">--</div></div>
-<div class="data"><small>Trend Direction</small><div id="trend" class="value">--</div></div>
-<div class="data"><small>Last Candle</small><div id="lastcandle" class="value">--</div></div>
+<section class="panel">
+<h2>MULTI-TIMEFRAME ANALYSIS</h2>
+<p class="status">
+4H → 1H → 30M → 15M → 5M EXECUTION
+</p>
+<div id="timeframes">
+<p class="neutral">Waiting for analysis...</p>
 </div>
-</div>
+</section>
 
-<div class="panel">
+<section class="panel">
 <h2>LIVE ORDER BOOK ANALYSIS</h2>
 <div class="grid">
-<div class="data"><small>Best Bid</small><div id="bid" class="value">--</div></div>
-<div class="data"><small>Best Ask</small><div id="ask" class="value">--</div></div>
-<div class="data"><small>Spread %</small><div id="spread" class="value">--</div></div>
-<div class="data"><small>Buy / Sell Depth Ratio</small><div id="imbalance" class="value">--</div></div>
+ <div class="data"><small>Best Bid</small><div id="bid" class="value">--</div></div>
+ <div class="data"><small>Best Ask</small><div id="ask" class="value">--</div></div>
+ <div class="data"><small>Spread</small><div id="spread" class="value">--</div></div>
+ <div class="data"><small>Buy / Sell Depth Ratio</small><div id="ratio" class="value">--</div></div>
 </div>
-</div>
+</section>
 
-<div class="panel">
+<section class="panel">
 <h2>LIQUIDITY TRAP PROTECTION</h2>
 <div class="grid">
-<div class="data"><small>Spread Filter</small><div id="spreadcheck" class="value">--</div></div>
-<div class="data"><small>Market Depth</small><div id="depthcheck" class="value">--</div></div>
-<div class="data"><small>Volume Filter</small><div id="liquiditycheck" class="value">--</div></div>
-<div class="data"><small>Overall Protection</small><div id="trapcheck" class="value">--</div></div>
+ <div class="data"><small>Spread Filter</small><div id="spreadcheck" class="value">--</div></div>
+ <div class="data"><small>Market Depth</small><div id="depthcheck" class="value">--</div></div>
+ <div class="data"><small>Order Book Confirmation</small><div id="bookcheck" class="value">--</div></div>
+ <div class="data"><small>Overall Protection</small><div id="protection" class="value">--</div></div>
 </div>
-</div>
+</section>
 
-<div class="panel result">
+<section class="panel">
+<h2>TRADE EXECUTION — 5 MINUTES</h2>
+<div class="pricebox">
+ <div class="priceitem"><small>Entry Price</small><b id="entry">--</b></div>
+ <div class="priceitem"><small>Stop Loss</small><b id="sl">--</b></div>
+ <div class="priceitem"><small>Target 1</small><b id="target1">--</b></div>
+ <div class="priceitem"><small>Target 2</small><b id="target2">--</b></div>
+</div>
+<p id="validity" class="status">Waiting for signal</p>
+</section>
+
+<section class="panel signal">
 <h2>FINAL TRADE SIGNAL</h2>
-<div id="signal" class="signal pending">ANALYSIS PENDING</div>
-<p id="reason">Waiting for complete live data validation.</p>
-</div>
+<strong id="signal" class="pending">NO TRADE</strong>
+<p id="reason">Waiting for complete multi-timeframe analysis.</p>
+</section>
 
-<div class="panel">
+<section class="panel">
 <h2>DATA SOURCE STATUS</h2>
 <pre id="details">No scan performed yet.</pre>
-</div>
+</section>
 
 </main>
 
 <script>
 const $ = id => document.getElementById(id);
 
-function fmt(x){
- if(x===null || x===undefined || !Number.isFinite(Number(x))) return "--";
- return Number(x).toLocaleString("en-US",{maximumFractionDigits:8});
-}
-
 function set(id,value){
- $(id).textContent=value;
+ $(id).textContent=value ?? "--";
 }
 
-function pass(id,ok){
+function fmt(value){
+ if(value===null || value===undefined ||
+    !Number.isFinite(Number(value))) return "--";
+
+ return Number(value).toLocaleString("en-US",{
+  maximumFractionDigits:8
+ });
+}
+
+function statusClass(value){
+ if(value==="BULLISH" || value==="PASS" ||
+    value==="CONFIRMED") return "good";
+
+ if(value==="BEARISH" || value==="FAIL" ||
+    value==="BLOCKED") return "bad";
+
+ return "warn";
+}
+
+function showCheck(id,ok){
  set(id,ok?"PASS":"FAIL");
  $(id).className="value "+(ok?"good":"bad");
 }
 
-function ema(values,period){
- if(values.length<period) return null;
- const k=2/(period+1);
- let v=values.slice(0,period).reduce((a,b)=>a+b,0)/period;
- for(let i=period;i<values.length;i++){
-  v=values[i]*k+v*(1-k);
- }
- return v;
-}
+function renderTimeframe(name,data){
+ const trend=data.trend || "NEUTRAL";
+ const cls=statusClass(trend);
 
-function rsi(values,period=14){
- if(values.length<=period) return null;
- let gains=0,losses=0;
- for(let i=values.length-period;i<values.length;i++){
-  const d=values[i]-values[i-1];
-  if(d>0) gains+=d;
-  else losses-=d;
- }
- if(losses===0) return 100;
- return 100-(100/(1+gains/losses));
-}
-
-function level(x){
- if(Array.isArray(x)){
-  if(Array.isArray(x[0])){
-   return {price:Number(x[0]),qty:Number(x[1])};
-  }
-  if(typeof x[0]==="object"){
-   return {
-    price:Number(x[0].price ?? x[0].p),
-    qty:Number(x[0].quantity ?? x[0].qty ?? x[0].q)
-   };
-  }
- }
- if(x && typeof x==="object"){
-  return {
-   price:Number(x.price ?? x.p),
-   qty:Number(x.quantity ?? x.qty ?? x.q)
-  };
- }
- return null;
-}
-
-// Handles CoinDCX object-based AND array-based order books.
-function bookLevels(side){
- if(!side) return [];
-
- let entries;
-
- if(Array.isArray(side)){
-  entries=side;
- }else if(typeof side==="object"){
-  entries=Object.entries(side);
- }else{
-  return [];
- }
-
- return entries.map(item=>{
-  let v;
-
-  if(Array.isArray(item)){
-   v=Array.isArray(item[1])
-     ? level(item[1])
-     : {price:Number(item[0]),qty:Number(item[1])};
-  }else{
-   v=level(item);
-  }
-
-  return v;
- }).filter(x=>
-  x && Number.isFinite(x.price) &&
-  Number.isFinite(x.qty) && x.price>0 && x.qty>0
- );
+ return `
+ <div class="tf">
+  <div class="tfhead">
+   <strong>${name} ANALYSIS</strong>
+   <span class="pill ${cls}">${trend}</span>
+  </div>
+  <div class="metrics">
+   <div class="metric">
+    <span>EMA 20</span>
+    <b>${fmt(data.ema20)}</b>
+   </div>
+   <div class="metric">
+    <span>EMA 50</span>
+    <b>${fmt(data.ema50)}</b>
+   </div>
+   <div class="metric">
+    <span>EMA 200</span>
+    <b>${fmt(data.ema200)}</b>
+   </div>
+   <div class="metric">
+    <span>RSI 14</span>
+    <b>${fmt(data.rsi)}</b>
+   </div>
+   <div class="metric">
+    <span>Volume</span>
+    <b class="${data.volumeRising?"good":"warn"}">
+     ${data.volumeRising?"RISING":"NOT RISING"}
+    </b>
+   </div>
+   <div class="metric">
+    <span>Momentum</span>
+    <b>${data.bullishMomentum?"BULLISH":
+       data.bearishMomentum?"BEARISH":"MIXED"}</b>
+   </div>
+   <div class="metric">
+    <span>Last Candle</span>
+    <b>${data.candle}</b>
+   </div>
+   <div class="metric">
+    <span>ATR 14</span>
+    <b>${fmt(data.atr)}</b>
+   </div>
+  </div>
+ </div>`;
 }
 
 async function scanCoin(){
@@ -233,182 +276,106 @@ async function scanCoin(){
  const button=$("scan");
  button.disabled=true;
 
- set("status","Fetching CoinDCX live market data...");
+ set("status","Fetching all five timeframes...");
  set("signal","ANALYSIS PENDING");
- $("signal").className="signal pending";
- set("reason","Validating market conditions...");
- set("details","Connecting to CoinDCX...");
+ $("signal").className="pending";
+ set("reason","Validating market data and liquidity...");
 
  try{
-  const response=await fetch("/api/scan/"+encodeURIComponent(pair));
+  const response=await fetch(
+   "/api/scan/"+encodeURIComponent(pair)
+  );
+
   const result=await response.json();
 
-  if(!response.ok || !result.success){
-   throw new Error(result.error || "Scan failed");
+  if(!response.ok || !result.success || !result.complete){
+   throw new Error(result.error || "Incomplete market data");
   }
 
   const d=result.data;
   const t=d.ticker;
-  const ob=d.orderbook;
-  const candles=d.candles;
+  const a=d.analysis;
+  const b=d.orderbook;
+  const trade=d.trade;
+
+  if(!a || !a["4H"] || !a["1H"] ||
+     !a["30M"] || !a["15M"] || !a["5M"]){
+   throw new Error("Missing timeframe analysis");
+  }
+
+  set("price",fmt(t.last_price));
+  set("volume",fmt(t.volume_24h));
+  set("change",fmt(t.change_percent)+"%");
+  set("funding",fmt(t.funding_rate));
+
+  $("timeframes").innerHTML=[
+   "4H","1H","30M","15M","5M"
+  ].map(tf=>renderTimeframe(tf,a[tf])).join("");
+
+  set("bid",fmt(b.bestBid));
+  set("ask",fmt(b.bestAsk));
+  set("spread",fmt(b.spread)+"%");
+  set("ratio",fmt(b.ratio));
+
+  showCheck("spreadcheck",b.spreadOK);
+  showCheck("depthcheck",b.depthOK);
+
+  const bookConfirmed=trade.orderBookConfirmed;
+  showCheck("bookcheck",bookConfirmed);
+  showCheck("protection",b.protection);
+
+  set("entry",fmt(trade.entry));
+  set("sl",fmt(trade.stopLoss));
+  set("target1",fmt(trade.target1));
+  set("target2",fmt(trade.target2));
+
+  set("validity",
+   trade.signal==="NO TRADE"
+    ? "No execution signal"
+    : "Based on completed 5M candle. Recheck on next completed candle."
+  );
+
+  set("signal",trade.signal);
+  $("signal").className=
+   trade.signal==="BUY"?"buy":
+   trade.signal==="SELL"?"sell":"pending";
+
+  set("reason",trade.reason);
 
   $("details").textContent=JSON.stringify({
    instrument:d.instrument,
+   exchange:d.exchange,
+   analysisTimeframes:["4H","1H","30M","15M"],
+   executionTimeframe:"5M",
    dataStatus:d.dataStatus,
-   errors:d.errors
+   signalCandleTime:trade.signalCandleTime,
+   timestamp:d.timestamp
   },null,2);
 
-  if(!result.complete || !t || !ob || !candles){
-   throw new Error("Incomplete live data. No trade permitted.");
-  }
-
-  if(!Array.isArray(candles) || candles.length<30){
-   throw new Error("Insufficient candle history");
-  }
-
-  const price=Number(t.last_price);
-  const volume=Number(t.volume_24h);
-
-  if(!Number.isFinite(price) || price<=0 ||
-     !Number.isFinite(volume) || volume<=0){
-   throw new Error("Invalid ticker data");
-  }
-
-  set("price",fmt(price));
-  set("volume",fmt(volume));
-  set("change",fmt(t.change_percent)+"%");
-  set("funding",fmt(t.funding_rate));
-  set("book","Received");
-  set("candles",candles.length+" candles");
-
-  const closes=candles.map(c=>Number(c.close));
-  const volumes=candles.map(c=>Number(c.volume));
-
-  if(closes.some(x=>!Number.isFinite(x)||x<=0)){
-   throw new Error("Invalid candle prices");
-  }
-
-  const e9=ema(closes,9);
-  const e20=ema(closes,20);
-  const r=rsi(closes);
-  const last=candles[candles.length-1];
-  const previous=candles[candles.length-2];
-
-  const recentVol=volumes.slice(-5);
-  const oldVol=volumes.slice(-25,-5);
-
-  const avgRecent=recentVol.reduce((a,b)=>a+b,0)/recentVol.length;
-  const avgOld=oldVol.reduce((a,b)=>a+b,0)/oldVol.length;
-
-  const risingVolume=avgOld>0 && avgRecent>avgOld;
-
-  const bullishTrend=e9>e20 && price>e20;
-  const bearishTrend=e9<e20 && price<e20;
-
-  const green=last.close>last.open;
-  const red=last.close<last.open;
-
-  set("ema9",fmt(e9));
-  set("ema20",fmt(e20));
-  set("rsi",fmt(r));
-  set("volcheck",risingVolume?"RISING":"NOT RISING");
-  set("trend",bullishTrend?"BULLISH":bearishTrend?"BEARISH":"MIXED");
-  set("lastcandle",green?"GREEN":red?"RED":"NEUTRAL");
-
-  // Order book normalization
-  const bids=bookLevels(ob.bids);
-  const asks=bookLevels(ob.asks);
-
-  if(!bids.length || !asks.length){
-   throw new Error("Invalid order book levels");
-  }
-
-  bids.sort((a,b)=>b.price-a.price);
-  asks.sort((a,b)=>a.price-b.price);
-
-  const bestBid=bids[0].price;
-  const bestAsk=asks[0].price;
-
-  if(bestAsk<=bestBid){
-   throw new Error("Invalid order book spread");
-  }
-
-  const bidDepth=bids.reduce((s,x)=>s+x.price*x.qty,0);
-  const askDepth=asks.reduce((s,x)=>s+x.price*x.qty,0);
-
-  const ratio=askDepth>0?bidDepth/askDepth:0;
-  const spread=((bestAsk-bestBid)/((bestAsk+bestBid)/2))*100;
-
-  set("bid",fmt(bestBid));
-  set("ask",fmt(bestAsk));
-  set("spread",fmt(spread)+"%");
-  set("imbalance",fmt(ratio));
-
-  // Conservative liquidity checks
-  const spreadOK=spread>0 && spread<=0.15;
-  const depthOK=Math.min(bidDepth,askDepth)>=100;
-  const volumeOK=volume>0 && avgRecent>0;
-  const trapOK=spreadOK && depthOK && volumeOK;
-
-  pass("spreadcheck",spreadOK);
-  pass("depthcheck",depthOK);
-  pass("liquiditycheck",volumeOK);
-  pass("trapcheck",trapOK);
-
-  // Strict trade confirmation
-  const bullish=
-   bullishTrend &&
-   risingVolume &&
-   r>=50 && r<=70 &&
-   green &&
-   last.close>previous.close &&
-   trapOK;
-
-  const bearish=
-   bearishTrend &&
-   risingVolume &&
-   r>=30 && r<=50 &&
-   red &&
-   last.close<previous.close &&
-   trapOK;
-
-  let finalSignal="NO TRADE";
-  let explanation="Mandatory confirmations not satisfied.";
-
-  if(bullish){
-   finalSignal="BUY";
-   explanation="Bullish trend, momentum, rising volume and liquidity confirmations passed.";
-  }else if(bearish){
-   finalSignal="SELL";
-   explanation="Bearish trend, momentum, rising volume and liquidity confirmations passed.";
-  }else if(!trapOK){
-   explanation="Liquidity protection blocked this setup. Do not enter.";
-  }
-
-  set("signal",finalSignal);
-  $("signal").className="signal "+
-   (finalSignal==="BUY"?"buy":
-    finalSignal==="SELL"?"sell":"pending");
-
-  set("reason",explanation);
-  set("status","Scan completed successfully for "+pair);
+  set("status","Analysis completed for "+pair);
 
  }catch(error){
   set("status","ERROR: "+error.message);
   set("signal","DATA ERROR");
-  $("signal").className="signal pending";
-  set("reason","Reliable data unavailable. No trade signal.");
-  set("details",error.message);
-  [
-   "price","volume","change","funding","bid","ask",
-   "spread","imbalance","ema9","ema20","rsi",
-   "volcheck","trend","lastcandle","book","candles",
-   "spreadcheck","depthcheck","liquiditycheck","trapcheck"
-  ].forEach(id=>set(id,"--"));
+  $("signal").className="pending";
+  set("reason","Data incomplete or unreliable. No trade permitted.");
+
+  set("entry","--");
+  set("sl","--");
+  set("target1","--");
+  set("target2","--");
+  set("validity","No valid execution signal");
+
+  $("timeframes").innerHTML=
+   '<p class="bad">Analysis unavailable. Please retry.</p>';
+
+  $("details").textContent=error.message;
+
  }finally{
   button.disabled=false;
  }
 }
 </script>
+
 </body>
 </html>
